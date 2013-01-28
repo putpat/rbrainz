@@ -36,7 +36,10 @@ module MusicBrainz
       # Raises:: MBXML::ParseError
       def initialize(stream, factory=nil)
         begin
-          stream = stream.set_encoding "utf-8"
+          # Fix for Ruby 1.9.2 => Stream content should be UTF-8
+          str = stream.string
+          stream = StringIO.new(str.force_encoding('utf-8'))
+
           @document = REXML::Document.new(stream)
         rescue REXML::ParseException => e
           raise ParseError, e.to_s
